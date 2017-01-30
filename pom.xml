@@ -84,7 +84,10 @@
         <main.basedir>${project.basedir}</main.basedir>
 
         <!-- Axon -->
-        <version.axon>[3.0,3.1)</version.axon>
+        <version.axon>3.0</version.axon>
+
+        <!-- ActiveMQ -->
+        <version.activemq>5.14.3</version.activemq>
     </properties>
 
     <build>
@@ -389,6 +392,18 @@
                 <version>2.6.9</version>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>org.apache.activemq.tooling</groupId>
+                <artifactId>activemq-junit</artifactId>
+                <version>${version.activemq}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-broker</artifactId>
+                <version>${version.activemq}</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -408,6 +423,14 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq.tooling</groupId>
+            <artifactId>activemq-junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-broker</artifactId>
         </dependency>
     </dependencies>
 

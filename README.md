@@ -6,6 +6,8 @@ Integrates [AxonFramework](https://github.com/AxonFramework/AxonFramework) with 
 
 [![Code Coverage](https://img.shields.io/codecov/c/github/sventorben/axon-jms/master.svg)](https://codecov.io/github/sventorben/axon-jms?branch=master)
 
+This is basically an adaptation of [Axon's AMQP implementation](https://github.com/AxonFramework/AxonFramework/tree/axon-3.0.1/amqp).
+
 ## Maven Coordinates
 
 The latest RELEASE is available via Maven Central.
