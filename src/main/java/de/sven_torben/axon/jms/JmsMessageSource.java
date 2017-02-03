@@ -71,6 +71,4 @@ public class JmsMessageSource implements MessageListener,
     eventProcessors.forEach(p -> p.accept(events));
   }
 
-  
-
 }

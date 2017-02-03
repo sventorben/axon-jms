@@ -26,9 +26,9 @@ package de.sven_torben.axon.jms;
 import java.util.List;
 import java.util.function.Consumer;
 import javax.jms.JMSException;
+import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.Session;
-import javax.jms.TextMessage;
 import javax.jms.Topic;
 import javax.jms.TopicConnection;
 import javax.jms.TopicPublisher;
@@ -97,7 +97,7 @@ public class JmsMessageSourceTest {
                 .asEventMessage("SomePayload")
                 .withMetaData(MetaData.with("key", "value"));
         
-        TextMessage jmsMessage = converter.createJmsMessage(eventMessage, topicSession);
+        Message jmsMessage = converter.createJmsMessage(eventMessage, topicSession);
         
         publisher.publish(jmsMessage);
 
@@ -115,7 +115,7 @@ public class JmsMessageSourceTest {
                 .asEventMessage("SomePayload")
                 .withMetaData(MetaData.with("key", "value"));
         
-        TextMessage jmsMessage = converter.createJmsMessage(eventMessage, topicSession);
+        Message jmsMessage = converter.createJmsMessage(eventMessage, topicSession);
         
         publisher.publish(jmsMessage);
 

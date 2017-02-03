@@ -24,7 +24,7 @@ public interface JmsMessageConverter {
    * @return a JMS Message containing the data and characteristics (properties) of the Message
     to send to the JMS Message Broker.
    */
-  TextMessage createJmsMessage(EventMessage<?> eventMessage, Session session) throws JMSException;
+  Message createJmsMessage(EventMessage<?> eventMessage, Session session) throws JMSException;
 
   /**
    * Reconstruct an EventMessage from the given {@code jmsMessage}. The returned optional

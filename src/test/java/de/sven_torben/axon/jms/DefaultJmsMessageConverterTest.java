@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import javax.jms.JMSException;
+import javax.jms.Message;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.jms.TopicConnection;
@@ -52,7 +53,8 @@ public class DefaultJmsMessageConverterTest {
   public void testWriteAndReadEventMessage() throws Exception {
     EventMessage<?> eventMessage = GenericEventMessage.asEventMessage("SomePayload")
         .withMetaData(MetaData.with("key", "value"));
-    TextMessage jmsMessage = cut.createJmsMessage(eventMessage, topicSession);
+    Message jmsMessage = cut.createJmsMessage(eventMessage, topicSession);
+    
     EventMessage<?> actualResult = cut.readJmsMessage(jmsMessage)
         .orElseThrow(() -> new AssertionError("Expected valid message"));
 
@@ -68,7 +70,7 @@ public class DefaultJmsMessageConverterTest {
   public void testMessageIgnoredIfNotAxonMessageIdPresent() throws JMSException {
     EventMessage<?> eventMessage = GenericEventMessage.asEventMessage("SomePayload")
         .withMetaData(MetaData.with("key", "value"));
-    TextMessage jmsMessage = cut.createJmsMessage(eventMessage, topicSession);
+    Message jmsMessage = cut.createJmsMessage(eventMessage, topicSession);
 
     jmsMessage.setObjectProperty("axon-message-id", null);
     assertFalse(cut.readJmsMessage(jmsMessage).isPresent());
@@ -78,7 +80,7 @@ public class DefaultJmsMessageConverterTest {
   public void testMessageIgnoredIfNotAxonMessageTypePresent() throws JMSException {
     EventMessage<?> eventMessage = GenericEventMessage.asEventMessage("SomePayload")
         .withMetaData(MetaData.with("key", "value"));
-    TextMessage jmsMessage = cut.createJmsMessage(eventMessage, topicSession);
+    Message jmsMessage = cut.createJmsMessage(eventMessage, topicSession);
 
     jmsMessage.setObjectProperty("axon-message-type", null);
     assertFalse(cut.readJmsMessage(jmsMessage).isPresent());
@@ -88,7 +90,7 @@ public class DefaultJmsMessageConverterTest {
   public void testWriteAndReadDomainEventMessage() throws Exception {
     DomainEventMessage<?> eventMessage = new GenericDomainEventMessage<>(
         "Stub", "1234", 1L, "Payload", MetaData.with("key", "value"));
-    TextMessage jmsMessage = cut.createJmsMessage(eventMessage, topicSession);
+    Message jmsMessage = cut.createJmsMessage(eventMessage, topicSession);
     final EventMessage<?> actualResult = cut.readJmsMessage(jmsMessage)
         .orElseThrow(() -> new AssertionError("Expected valid message"));
 

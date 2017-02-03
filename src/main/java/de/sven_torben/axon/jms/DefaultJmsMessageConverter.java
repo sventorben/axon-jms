@@ -65,7 +65,7 @@ public class DefaultJmsMessageConverter implements JmsMessageConverter {
     }
 
     @Override
-    public TextMessage createJmsMessage(EventMessage<?> eventMessage, Session session)
+    public Message createJmsMessage(EventMessage<?> eventMessage, Session session)
             throws JMSException {
 
         SerializedObject<String> serializedObject
