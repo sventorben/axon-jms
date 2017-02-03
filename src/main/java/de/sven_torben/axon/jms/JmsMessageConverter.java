@@ -3,6 +3,7 @@ package de.sven_torben.axon.jms;
 import java.util.Optional;
 
 import javax.jms.JMSException;
+import javax.jms.Message;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
