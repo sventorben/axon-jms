@@ -91,7 +91,7 @@ public class JmsMessageSourceTest {
     }
 
     @Test
-    public void test() throws JMSException, InterruptedException {
+    public void messageGetsPublished() throws JMSException, InterruptedException {
         final TestConsumer testConsumer = new TestConsumer();
         cut.subscribe(testConsumer);
 
@@ -106,7 +106,6 @@ public class JmsMessageSourceTest {
         Thread.sleep(1000L);
 
         assertNotNull(testConsumer.latest);
-
     }
 
     private class TestConsumer implements Consumer<Object> {
@@ -117,7 +116,6 @@ public class JmsMessageSourceTest {
         public void accept(Object t) {
             this.latest = t;
         }
-
     }
 
 }

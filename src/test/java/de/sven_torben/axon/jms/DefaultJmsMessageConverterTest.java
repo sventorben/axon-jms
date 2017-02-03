@@ -109,4 +109,15 @@ public class DefaultJmsMessageConverterTest {
     assertEquals(eventMessage.getSequenceNumber(),
         ((DomainEventMessage) actualResult).getSequenceNumber());
   }
+  
+  @Test
+  public void objectMessageWillNotBeConverted() throws Exception {    
+      assertFalse(cut.readJmsMessage(topicSession.createObjectMessage()).isPresent());
+  }
+  
+  @Test
+  public void byteMessageWillNotBeConverted() throws Exception {    
+      assertFalse(cut.readJmsMessage(topicSession.createBytesMessage()).isPresent());
+  }
+  
 }

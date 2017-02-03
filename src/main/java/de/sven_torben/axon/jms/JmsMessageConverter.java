@@ -33,5 +33,5 @@ public interface JmsMessageConverter {
    * @param jmsMessage The JMS Message
    * @return The Event Message to publish on the local event processors
    */
-  Optional<EventMessage<?>> readJmsMessage(TextMessage jmsMessage) throws JMSException;
+  Optional<EventMessage<?>> readJmsMessage(Message jmsMessage) throws JMSException;
 }
