@@ -47,12 +47,11 @@ public class DefaultJmsMessageConverterTest {
 
   private TopicSession topicSession;
   private TopicConnection topicConnection;
-  private TopicConnectionFactory connectionFactory;
 
   @Before
   public void setUp() throws Exception {
     cut = new DefaultJmsMessageConverter(new XStreamSerializer());
-    connectionFactory = embeddedBroker.createConnectionFactory();
+    TopicConnectionFactory connectionFactory = embeddedBroker.createConnectionFactory();
     topicConnection = connectionFactory.createTopicConnection();
     topicSession = topicConnection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
   }
