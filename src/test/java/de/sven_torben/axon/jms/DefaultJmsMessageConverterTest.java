@@ -116,8 +116,18 @@ public class DefaultJmsMessageConverterTest {
   }
   
   @Test
-  public void byteMessageWillNotBeConverted() throws Exception {    
+  public void bytesMessageWillNotBeConverted() throws Exception {    
       assertFalse(cut.readJmsMessage(topicSession.createBytesMessage()).isPresent());
+  }
+  
+  @Test
+  public void streamMessageWillNotBeConverted() throws Exception {    
+      assertFalse(cut.readJmsMessage(topicSession.createStreamMessage()).isPresent());
+  }
+  
+  @Test
+  public void mapMessageWillNotBeConverted() throws Exception {    
+      assertFalse(cut.readJmsMessage(topicSession.createMapMessage()).isPresent());
   }
   
 }

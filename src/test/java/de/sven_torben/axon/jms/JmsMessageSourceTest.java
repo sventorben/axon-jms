@@ -23,7 +23,7 @@
  */
 package de.sven_torben.axon.jms;
 
-import java.util.UUID;
+import java.util.List;
 import java.util.function.Consumer;
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
@@ -40,8 +40,8 @@ import org.axonframework.eventhandling.GenericEventMessage;
 import org.axonframework.messaging.MetaData;
 import org.axonframework.serialization.xml.XStreamSerializer;
 import org.junit.After;
-import org.junit.Assert;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -61,9 +61,7 @@ public class JmsMessageSourceTest {
 
     private TopicConnection topicConnection;
 
-    private DefaultJmsMessageConverter converter = new DefaultJmsMessageConverter(new XStreamSerializer());;
-
-    Object oga;
+    final private DefaultJmsMessageConverter converter = new DefaultJmsMessageConverter(new XStreamSerializer());
 
     @Before
     public void setup() throws JMSException {
@@ -107,13 +105,32 @@ public class JmsMessageSourceTest {
 
         assertNotNull(testConsumer.latest);
     }
+    
+    @Test
+    public void containsTheMessage() throws JMSException, InterruptedException {
+        final TestConsumer testConsumer = new TestConsumer();
+        cut.subscribe(testConsumer);
 
-    private class TestConsumer implements Consumer<Object> {
+        EventMessage<?> eventMessage = GenericEventMessage
+                .asEventMessage("SomePayload")
+                .withMetaData(MetaData.with("key", "value"));
+        
+        TextMessage jmsMessage = converter.createJmsMessage(eventMessage, topicSession);
+        
+        publisher.publish(jmsMessage);
 
-        private Object latest;
+        Thread.sleep(1000L);
+        
+        assertTrue(testConsumer.latest.get(0)
+                .getMetaData().get("key").equals("value"));
+    }
+
+    private class TestConsumer implements Consumer<List<? extends EventMessage<?>>> {
+
+        private List<? extends EventMessage<?>> latest;
 
         @Override
-        public void accept(Object t) {
+        public void accept(List<? extends EventMessage<?>> t) {
             this.latest = t;
         }
     }

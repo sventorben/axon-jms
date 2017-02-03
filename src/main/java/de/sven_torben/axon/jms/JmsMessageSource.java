@@ -27,24 +27,21 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
-import javax.jms.TextMessage;
 import org.axonframework.common.Registration;
 import org.axonframework.eventhandling.EventMessage;
 import org.axonframework.messaging.SubscribableMessageSource;
 
-public class JmsMessageSource implements MessageListener, SubscribableMessageSource {
+public class JmsMessageSource implements MessageListener, 
+        SubscribableMessageSource<EventMessage<?>> {
 
   private final List<Consumer<List<? extends EventMessage<?>>>> eventProcessors = new CopyOnWriteArrayList<>();
   private JmsMessageConverter converter;
 
-  public JmsMessageSource(MessageConsumer consumer,
-          JmsMessageConverter converter) {
+  public JmsMessageSource(MessageConsumer consumer, JmsMessageConverter converter) {
     try {
       this.converter = converter;
       consumer.setMessageListener(this);
@@ -52,9 +49,9 @@ public class JmsMessageSource implements MessageListener, SubscribableMessageSou
       throw new RuntimeException(ex);
     }
   }
-
+  
   @Override
-  public Registration subscribe(Consumer cnsmr) {
+  public Registration subscribe(Consumer<List<? extends EventMessage<?>>> cnsmr) {
     eventProcessors.add(cnsmr);
     return () -> eventProcessors.remove(cnsmr);
   }
@@ -73,5 +70,7 @@ public class JmsMessageSource implements MessageListener, SubscribableMessageSou
   private void publish(List<? extends EventMessage<?>> events) {
     eventProcessors.forEach(p -> p.accept(events));
   }
+
+  
 
 }

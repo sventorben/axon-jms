@@ -99,35 +99,35 @@ public class DefaultJmsMessageConverter implements JmsMessageConverter {
             return Optional.empty();
         }
         
-        final TextMessage jmsMessage = (TextMessage) msg;
+        final TextMessage textMsg = (TextMessage) msg;
 
-        if (jmsMessage.getObjectProperty("axon-message-id") == null
-                || jmsMessage.getObjectProperty("axon-message-type") == null) {
+        if (textMsg.getObjectProperty("axon-message-id") == null
+                || textMsg.getObjectProperty("axon-message-type") == null) {
             return Optional.empty();
         }
         Map<String, Object> metaData = new HashMap<>();
-        Enumeration<String> propertyNames = jmsMessage.getPropertyNames();
+        Enumeration<String> propertyNames = textMsg.getPropertyNames();
         while (propertyNames.hasMoreElements()) {
             String propertyName = propertyNames.nextElement();
             if (propertyName.startsWith("axon-metadata-")) {
                 metaData.put(propertyName.substring("axon-metadata-".length()),
-                        jmsMessage.getObjectProperty(propertyName));
+                        textMsg.getObjectProperty(propertyName));
             }
         }
         SimpleSerializedObject<String> serializedObject = new SimpleSerializedObject<>(
-                jmsMessage.getText(), String.class,
-                jmsMessage.getStringProperty("axon-message-type"),
-                jmsMessage.getStringProperty("axon-message-revision"));
+                textMsg.getText(), String.class,
+                textMsg.getStringProperty("axon-message-type"),
+                textMsg.getStringProperty("axon-message-revision"));
         SerializedMessage<EventMessage<?>> serializedMessage = new SerializedMessage<>(
-                jmsMessage.getStringProperty("axon-message-id"),
+                textMsg.getStringProperty("axon-message-id"),
                 new LazyDeserializingObject<>(serializedObject, serializer),
                 new LazyDeserializingObject<>(MetaData.from(metaData)));
-        String timestamp = jmsMessage.getStringProperty("axon-message-timestamp");
-        if (jmsMessage.propertyExists("axon-message-aggregate-id")) {
+        String timestamp = textMsg.getStringProperty("axon-message-timestamp");
+        if (textMsg.propertyExists("axon-message-aggregate-id")) {
             return Optional.of(new GenericDomainEventMessage<>(
-                    jmsMessage.getStringProperty("axon-message-aggregate-type"),
-                    jmsMessage.getStringProperty("axon-message-aggregate-id"),
-                    jmsMessage.getLongProperty("axon-message-aggregate-seq"),
+                    textMsg.getStringProperty("axon-message-aggregate-type"),
+                    textMsg.getStringProperty("axon-message-aggregate-id"),
+                    textMsg.getLongProperty("axon-message-aggregate-seq"),
                     serializedMessage,
                     () -> Instant.parse(timestamp)));
         } else {
