@@ -18,6 +18,8 @@ package de.sven_torben.axon.jms;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -26,7 +28,9 @@ import static org.mockito.Mockito.when;
 
 import java.nio.charset.Charset;
 
+import javax.jms.DeliveryMode;
 import javax.jms.JMSException;
+import javax.jms.Message;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.jms.Topic;
@@ -43,6 +47,7 @@ import org.axonframework.messaging.unitofwork.UnitOfWork;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
 public class JmsPublisherTest {
 
@@ -67,6 +72,7 @@ public class JmsPublisherTest {
     cut.setTopic(topic);
     cut.setTransacted(true);
     cut.setMessageConverter(converter);
+    cut.postConstruct();
     cut.start();
   }
 
@@ -176,6 +182,29 @@ public class JmsPublisherTest {
     verify(publisher, never()).publish(jmsMessage);
     verify(transactionalSession, never()).commit();
     verify(connectionFactory, never()).createTopicConnection();
+  }
+
+  @Test
+  public void testSendPersistentMessage() throws Exception {
+    cut.setPersistent(true);
+    cut.setMessageConverter(null);
+    cut.postConstruct();
+
+    TopicConnection connection = mock(TopicConnection.class);
+    when(connectionFactory.createTopicConnection()).thenReturn(connection);
+    TopicSession transactionalSession = mock(TopicSession.class);
+
+    when(connection.createTopicSession(true, Session.SESSION_TRANSACTED))
+        .thenReturn(transactionalSession);
+    when(transactionalSession.createPublisher(topic)).thenReturn(publisher);
+    TextMessage jmsMessage = mock(TextMessage.class);
+    when(transactionalSession.createTextMessage(any())).thenReturn(jmsMessage);
+    ArgumentCaptor<Message> jmsMsgCapture = ArgumentCaptor.forClass(Message.class);
+    doNothing().when(publisher).publish(jmsMsgCapture.capture());
+
+    eventBus.publish(new GenericEventMessage<>("Message"));
+
+    verify(jmsMessage).setJMSDeliveryMode(DeliveryMode.PERSISTENT);
   }
 
 }
