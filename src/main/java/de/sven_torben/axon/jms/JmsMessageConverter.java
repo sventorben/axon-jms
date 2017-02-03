@@ -5,7 +5,6 @@ import java.util.Optional;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
-import javax.jms.TextMessage;
 
 import org.axonframework.eventhandling.EventMessage;
 
