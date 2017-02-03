@@ -21,8 +21,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import javax.jms.JMSException;
+import javax.jms.Message;
 import javax.jms.Session;
-import javax.jms.TextMessage;
 import javax.jms.TopicConnection;
 import javax.jms.TopicConnectionFactory;
 import javax.jms.TopicSession;
@@ -66,10 +66,11 @@ public class DefaultJmsMessageConverterTest {
   @Test
   public void testWriteAndReadEventMessage() throws Exception {
     EventMessage<?> eventMessage = GenericEventMessage.asEventMessage("SomePayload")
-        .withMetaData(MetaData.with("key", "value"));
-    TextMessage jmsMessage = cut.createJmsMessage(eventMessage, topicSession);
+            .withMetaData(MetaData.with("key", "value"));
+    Message jmsMessage = cut.createJmsMessage(eventMessage, topicSession);
+
     EventMessage<?> actualResult = cut.readJmsMessage(jmsMessage)
-        .orElseThrow(() -> new AssertionError("Expected valid message"));
+            .orElseThrow(() -> new AssertionError("Expected valid message"));
 
     assertEquals(eventMessage.getIdentifier(), jmsMessage.getStringProperty("axon-message-id"));
     assertEquals(eventMessage.getIdentifier(), actualResult.getIdentifier());
@@ -82,8 +83,8 @@ public class DefaultJmsMessageConverterTest {
   @Test
   public void testMessageIgnoredIfNotAxonMessageIdPresent() throws JMSException {
     EventMessage<?> eventMessage = GenericEventMessage.asEventMessage("SomePayload")
-        .withMetaData(MetaData.with("key", "value"));
-    TextMessage jmsMessage = cut.createJmsMessage(eventMessage, topicSession);
+            .withMetaData(MetaData.with("key", "value"));
+    Message jmsMessage = cut.createJmsMessage(eventMessage, topicSession);
 
     jmsMessage.setObjectProperty("axon-message-id", null);
     assertFalse(cut.readJmsMessage(jmsMessage).isPresent());
@@ -92,8 +93,8 @@ public class DefaultJmsMessageConverterTest {
   @Test
   public void testMessageIgnoredIfNotAxonMessageTypePresent() throws JMSException {
     EventMessage<?> eventMessage = GenericEventMessage.asEventMessage("SomePayload")
-        .withMetaData(MetaData.with("key", "value"));
-    TextMessage jmsMessage = cut.createJmsMessage(eventMessage, topicSession);
+            .withMetaData(MetaData.with("key", "value"));
+    Message jmsMessage = cut.createJmsMessage(eventMessage, topicSession);
 
     jmsMessage.setObjectProperty("axon-message-type", null);
     assertFalse(cut.readJmsMessage(jmsMessage).isPresent());
@@ -102,10 +103,10 @@ public class DefaultJmsMessageConverterTest {
   @Test
   public void testWriteAndReadDomainEventMessage() throws Exception {
     DomainEventMessage<?> eventMessage = new GenericDomainEventMessage<>(
-        "Stub", "1234", 1L, "Payload", MetaData.with("key", "value"));
-    TextMessage jmsMessage = cut.createJmsMessage(eventMessage, topicSession);
+            "Stub", "1234", 1L, "Payload", MetaData.with("key", "value"));
+    Message jmsMessage = cut.createJmsMessage(eventMessage, topicSession);
     final EventMessage<?> actualResult = cut.readJmsMessage(jmsMessage)
-        .orElseThrow(() -> new AssertionError("Expected valid message"));
+            .orElseThrow(() -> new AssertionError("Expected valid message"));
 
     assertEquals(eventMessage.getIdentifier(), jmsMessage.getStringProperty("axon-message-id"));
     assertEquals("1234", jmsMessage.getStringProperty("axon-message-aggregate-id"));
@@ -118,10 +119,31 @@ public class DefaultJmsMessageConverterTest {
     assertEquals(eventMessage.getPayloadType(), actualResult.getPayloadType());
     assertEquals(eventMessage.getTimestamp(), actualResult.getTimestamp());
     assertEquals(eventMessage.getAggregateIdentifier(),
-        ((DomainEventMessage) actualResult).getAggregateIdentifier());
+            ((DomainEventMessage) actualResult).getAggregateIdentifier());
     assertEquals(eventMessage.getType(),
-        ((DomainEventMessage) actualResult).getType());
+            ((DomainEventMessage) actualResult).getType());
     assertEquals(eventMessage.getSequenceNumber(),
-        ((DomainEventMessage) actualResult).getSequenceNumber());
+            ((DomainEventMessage) actualResult).getSequenceNumber());
   }
+
+  @Test
+  public void objectMessageWillNotBeConverted() throws Exception {
+    assertFalse(cut.readJmsMessage(topicSession.createObjectMessage()).isPresent());
+  }
+
+  @Test
+  public void bytesMessageWillNotBeConverted() throws Exception {
+    assertFalse(cut.readJmsMessage(topicSession.createBytesMessage()).isPresent());
+  }
+
+  @Test
+  public void streamMessageWillNotBeConverted() throws Exception {
+    assertFalse(cut.readJmsMessage(topicSession.createStreamMessage()).isPresent());
+  }
+
+  @Test
+  public void mapMessageWillNotBeConverted() throws Exception {
+    assertFalse(cut.readJmsMessage(topicSession.createMapMessage()).isPresent());
+  }
+
 }

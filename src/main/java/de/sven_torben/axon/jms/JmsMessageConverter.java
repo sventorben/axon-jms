@@ -19,8 +19,8 @@ package de.sven_torben.axon.jms;
 import java.util.Optional;
 
 import javax.jms.JMSException;
+import javax.jms.Message;
 import javax.jms.Session;
-import javax.jms.TextMessage;
 
 import org.axonframework.eventhandling.EventMessage;
 
@@ -39,7 +39,7 @@ public interface JmsMessageConverter {
    * @return a JMS Message containing the data and characteristics (properties) of the Message
     to send to the JMS Message Broker.
    */
-  TextMessage createJmsMessage(EventMessage<?> eventMessage, Session session) throws JMSException;
+  Message createJmsMessage(EventMessage<?> eventMessage, Session session) throws JMSException;
 
   /**
    * Reconstruct an EventMessage from the given {@code jmsMessage}. The returned optional
@@ -48,5 +48,5 @@ public interface JmsMessageConverter {
    * @param jmsMessage The JMS Message
    * @return The Event Message to publish on the local event processors
    */
-  Optional<EventMessage<?>> readJmsMessage(TextMessage jmsMessage) throws JMSException;
+  Optional<EventMessage<?>> readJmsMessage(Message jmsMessage) throws JMSException;
 }
