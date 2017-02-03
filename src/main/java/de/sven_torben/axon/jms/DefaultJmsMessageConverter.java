@@ -39,9 +39,10 @@ import org.axonframework.serialization.Serializer;
 import org.axonframework.serialization.SimpleSerializedObject;
 
 /**
- * Default implementation of the JmsMessageConverter interface. This implementation will suffice in
- * most cases. It passes all meta-data entries as properties (with 'axon-metadata-' prefix) to the
- * message. Other message-specific attributes are also added as properties.
+ * Default implementation of the JmsMessageConverter interface. This
+ * implementation will suffice in most cases. It passes all meta-data entries as
+ * properties (with 'axon-metadata-' prefix) to the message. Other message-specific attributes
+ * are also added as properties.
  * The message payload is serialized using the configured serializer and passed as the message body.
  *
  * @author Sven-Torben Janus
