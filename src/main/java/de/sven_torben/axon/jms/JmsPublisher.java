@@ -123,13 +123,11 @@ public class JmsPublisher {
   private void handleTransaction(final TopicSession topicSession) {
     try {
 
-      if (CurrentUnitOfWork.isStarted()) {
+      if (CurrentUnitOfWork.isStarted() && isTransacted) {
         UnitOfWork<?> unitOfWork = CurrentUnitOfWork.get();
         unitOfWork.afterCommit(u -> {
           try {
-            if (topicSession.getTransacted()) {
-              topicSession.commit();
-            }
+            topicSession.commit();
           } catch (JMSException ex) {
             throw new EventPublicationFailedException(
                 "Failed to commit transaction on topic session.", ex);
@@ -138,9 +136,7 @@ public class JmsPublisher {
         });
         unitOfWork.onRollback(u -> {
           try {
-            if (topicSession.getTransacted()) {
-              topicSession.rollback();
-            }
+            topicSession.rollback();
           } catch (JMSException ex) {
             logger.warn("Unable to rollback transaction on topic session.", ex);
           }
@@ -207,10 +203,7 @@ public class JmsPublisher {
       topic = (Topic) initialContext.lookup(topicName);
     }
     if (messageConverter == null) {
-      if (serializer == null) {
-        serializer = new XStreamSerializer();
-      }
-      messageConverter = new DefaultJmsMessageConverter(serializer, isPersitent);
+      messageConverter = new DefaultJmsMessageConverter(new XStreamSerializer(), isPersitent);
     }
   }
 

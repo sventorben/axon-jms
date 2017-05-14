@@ -72,6 +72,7 @@ public class JmsPublisherTest {
     cut.setTopic(topic);
     cut.setTransacted(true);
     cut.setMessageConverter(converter);
+    cut.setPersistent(false);
     cut.postConstruct();
     cut.start();
   }
